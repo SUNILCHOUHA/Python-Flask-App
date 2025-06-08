@@ -1,0 +1,37 @@
+name: Flask Docker CI/CD
+
+on:
+  push:
+    branches:
+      - main   # Run this workflow on push to the main branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 🛎️ Checkout code
+      uses: actions/checkout@v3
+
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.10
+
+    - name: 📦 Install dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: ✅ Run tests (optional)
+      run: echo "Running tests... (You can add real tests here)"
+
+    - name: 🐳 Build Docker image
+      run: docker build -t flask-app .
+
+    - name: 🔐 Login to Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    - name: 🚀 Push Docker image
+      run: |
+        docker tag flask-app yourdockerusername/flask-app:latest
+        docker push yourdockerusername/flask-app:latest
